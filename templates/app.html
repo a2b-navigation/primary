@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('.static', filename='style.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    </head>
+
+    <body>
+        <div class="centered">
+            <div class="pod">
+                <h1>Welcome to the a2b control centre</h1>
+            </div>
+
+            <!-- Route creation -->
+            <div class="pod pod-border">
+                <h4>Create a route</h4>
+                <p>Tell us your starting point and ending point, and a2b will sort out the rest.</p>
+                <p>Once created, all you'll need to do is activate it below when you're ready to go.</p>
+            </div>
+
+            <!-- Route activation -->
+            <div class="pod pod-border">
+                <h4>Activate a route</h4>
+                <p>Once activated, you can start cycling and let a2b guide you</p>
+                <form method="POST" action="{{ url_for('route') }}">
+                    <p>
+                        Route to activate: 
+                        <select id="route" name="route">
+                            {% for route in routes %}
+                                <option value="{{ route['id'] }}">{{ route['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" value="Let's go!" />
+                    </p>
+                </form>
+                <div class="sep"></div>
+                <h6>Currently active route</h6>
+                <form method="POST" action="{{ url_for('route') }}">
+                    <select style="display: none;" id="route" name="route">
+                        <option value="none" selected></option>
+                    </select>
+                    <input type="submit" value="Cancel Route" />
+                </form>
+                <pre><code>{{ route }}</code></pre>
+            </div>
+        </div>
+    </body>
+</html>

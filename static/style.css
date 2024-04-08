@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
+
+h1, h2, h3, h4, h5, h6, p, select, input {
+    font-family: "Inter Tight", sans-serif;
+    margin: 5px;
+    margin-bottom: 5px;
+}
+
+h1 { font-size: 40px; font-weight: 600; }
+h2 { font-size: 36px; font-weight: 600 }
+h3 { font-size: 32px; font-weight: 500; }
+h4 { font-size: 28px; font-weight: 500; }
+h5 { font-size: 24px; font-weight: 400; }
+h6 { font-size: 20px; font-weight: 400;}
+p, pre { font-size: 17px; font-weight: 300; }
+
+pre {
+    margin: 5px;
+}
+
+div.pod-border {
+    border: 1px solid grey;
+    border-radius: 10px;
+}
+
+div.pod {
+    padding: 20px;
+    margin: 10px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+div.sep {
+    height: 3px;
+    margin: 0;
+}
+
+div.centered {
+    width: 650px;
+    
+}
+
+body {
+    display: flex;
+    justify-content: center;
+}
+
+input[type="submit"]:hover {
+    font-weight: bold;
+}
