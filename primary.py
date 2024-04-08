@@ -147,8 +147,8 @@ def route_creation():
     # Fill blank fields with the current GPS location
     if route_start == "" or route_end == "":
         gps = where_am_i()
-        if route_start == "": route_start = gps["latitude"] + "," + gps["longitude"]
-        if route_end == "": route_end = gps["latitude"] + "," + gps["longitude"]
+        if route_start == "": route_start = str(gps["latitude"]) + "," + str(gps["longitude"])
+        if route_end == "": route_end = str(gps["latitude"]) + "," + str(gps["longitude"])
     # Use the directions library to obtain a route
     new_route = {
         "name": route_name,
