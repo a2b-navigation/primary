@@ -14,6 +14,7 @@ import subprocess
 import directions
 import threading
 import math as m
+import actuation
 import json
 import time
 import os
@@ -153,17 +154,56 @@ def update():
                 last_instruction = route_pointer + 1 >= len(route["beacons"])
                 if arrived or last_instruction:
                     # Route has ended, deactivate
+                    other_device = "none"
                     active = False
                     route_pointer = 0
                     route = None
                     print("[Route Management] Route Finished")
                 else:
                     # On to the next instruction
+                    other_device = "none"
                     route_pointer += 1
                     print("[Route Management] Beacon Reached, on to the next one")
 
 updater = threading.Thread(target=update)
 updater.start()
+
+# Determine self-actuation pattern based off route information and gps location
+side = "right" # by default, the primary device is on the right hand side
+other_device = "none" # This governs what actuation pattern the other device should perform
+def actuation_checker():
+    global route
+    global route_pointer
+    global active
+    global other_device
+    while True:
+        if active:
+            print("[Actuation] Determining pattern...")
+            # Where are we going?
+            next_beacon = route["beacons"][route_pointer]["at"]
+            # Where are we now?
+            location = [gps_cache["lat"], gps_cache["lon"]]
+            # How far away are we?
+            distance_away = distance(next_beacon, location)
+            # Determine actuation pattern
+            if route["beacons"][route_pointer]["do"] == side:
+                # It is this device's responsibility to actuate
+                other_device = "none"
+                if distance_away < 20: actuation.very_near()
+                elif distance_away < 40: actuation.near()
+                elif distance_away < 60: actuation.far()
+                elif distance_away < 80: actuation.very_far()
+                else: time.sleep(0.5)
+            else:
+                # It is the other device's responsibility to actuate
+                if distance_away < 20: other_device = "very_near"
+                elif distance_away < 40: other_device = "near"
+                elif distance_away < 60: other_device = "far"
+                elif distance_away < 80: other_device = "very_far"
+                else: other_device = "none"
+
+actuation_checker = threading.Thread(target=actuation_checker)
+actuation_checker.start()
 
 # Host a webpage for the user to control the device
 app = Flask(__name__)
@@ -184,6 +224,7 @@ def route_control():
     route_request = request.form["route"]
     if route_request == "none":
         # User wishes to cancel the route
+        other_device = "none"
         active = False
         route_pointer = 0
         route = None
