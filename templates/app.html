@@ -3,7 +3,6 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('.static', filename='style.css') }}">
-        <!--<meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     </head>
 
     <body>
@@ -16,7 +15,10 @@
             <div class="pod pod-border">
                 <h4>Create a route</h4>
                 <p>Tell us your starting point and ending point, and a2b will sort out the rest.</p>
-                <p>Note that the format of start and end must be coordinates in the format <i>latitude,longitude</i></p>
+                <p>Note: Directions are from MapBox</p>
+                <p>Note: The start and end must be coordinates in the format <i>latitude,longitude</i></p>
+                <p>Note: Leave either the start or end blank if you want them to default to your current location</p>
+                <p>Note: This request may take a while if you are inside due to the nature of GPS technology</p>
                 <form method="POST" action="{{ url_for('route_creation') }}">
                     <p>
                         Name: 

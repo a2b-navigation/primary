@@ -3,9 +3,10 @@ Duties of the primary device:
 1. Query GPS location and store it [X]
 2. Serve a website for the user to interact with [X]
 3. Manage the route [X]
-4. Create routes [ ]
-5. Actuate the primary server to issue commands based off route and gps [ ]
-5. Allow the secondary server to receive commands based off route and gps [ ]
+4. Create routes [X]
+5. Very defensive input validation [ ]
+6. Actuate the primary server to issue commands based off route and gps [ ]
+7. Allow the secondary server to receive commands based off route and gps [ ]
 """
 
 from flask import *
@@ -15,6 +16,28 @@ import threading
 import json
 import time
 import os
+
+# Validate input
+def validate(text):
+    return text.replace("_", "").isalnum() and len(text) > 0
+
+# Validate coordinate input
+def validate_coord(coord):
+    has_comma = coord.count(",") == 1
+    has_points = coord.count(".") == 2
+    raw_dig = lambda s: s.replace(".", "").replace(",", "").replace("-", "")
+    is_numeric = raw_dig(coord).isnumeric()
+    good_precision = True
+    try:
+        [lat, lon] = coord.replace(", ", ",").split(",")
+        if len(raw_dig(lat)) < 7: good_precision = False
+        if len(raw_dig(lon)) < 7: good_precision = False
+        lat = float(lat)
+        lon = float(lon)
+        can_parse = True
+    except:
+        can_parse = False
+    return has_comma and has_points and is_numeric and can_parse and good_precision
 
 # Runs a command on the terminal and returns the output
 def run_command(command):
@@ -150,6 +173,13 @@ def route_creation():
         gps = where_am_i()
         if route_start == "": route_start = str(gps["latitude"]) + "," + str(gps["longitude"])
         if route_end == "": route_end = str(gps["latitude"]) + "," + str(gps["longitude"])
+    # Perform validation
+    if not validate_coord(route_start):
+        return redirect(url_for("error", msg="Starting coordinates are invalid"))
+    if not validate_coord(route_end):
+        return redirect(url_for("error", msg="Ending coordinates are invalid"))
+    if not validate(route_name):
+        return redirect(url_for("error", msg="Name of route must only contain letters, numbers and underscores and can't be empty"))
     # Use the directions library to obtain a route
     new_route = {
         "name": route_name,
@@ -164,6 +194,10 @@ def route_creation():
     # Redirect user back to control centre
     print("[Route Creation] Completed")
     return redirect(url_for("control_centre"))
+
+@app.route("/error/<msg>")
+def error(msg):
+    return render_template("error.html", msg=msg)
 
 if __name__ == "__main__":
     open_command_centre()
