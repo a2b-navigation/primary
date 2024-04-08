@@ -123,7 +123,7 @@ def route_control():
         route = get_route(route_request)
         route_pointer = 0
         active = True
-    return redirect_url(url_for("control_centre"))
+    return redirect(url_for("control_centre"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
