@@ -110,7 +110,7 @@ def control_centre():
 
 # Request to update route
 @app.route("/route")
-def route():
+def route_control():
     global active
     global route
     global route_pointer
