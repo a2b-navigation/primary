@@ -89,6 +89,7 @@ def update():
     while True:
         if active:
             update_gps()
+            print(gps_cache)
 
 updater = threading.Thread(target=update)
 updater.start()
@@ -124,7 +125,5 @@ def route():
         active = True
     return redirect_url(url_for("control_centre"))
 
-
-while True:
-    print(gps_cache)
-    time.sleep(1)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0")
