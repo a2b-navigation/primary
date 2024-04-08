@@ -13,9 +13,19 @@ from flask import *
 import subprocess
 import directions
 import threading
+import math as m
 import json
 import time
 import os
+
+# Work out the distance between two polar coordinates
+def distance(c1, c2):
+    lat1, lat2 = c1[0], c2[0]
+    lon1, lon2 = c1[1], c2[1]
+    radius = 6371
+    p = m.pi / 180
+    a = 0.5 - m.cos((lat2 - lat1) * p) / 2 + m.cos(lat1 * p) * m.cos(lat2 * p) * (1 - m.cos((lon2 - lon1) * p)) / 2
+    return 2 * radius * m.asin(m.sqrt(a)) * 1000
 
 # Validate input
 def validate(text):
@@ -70,6 +80,10 @@ def update_gps():
     print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
 
 # Begin execution!
+
+# Find the initial gps location
+print("[GPS] Aquiring initial GPS location")
+update_gps()
 
 # Set up route information
 active = False # Whether we are following a route or not
@@ -133,8 +147,8 @@ def update():
             next_beacon = route[route_pointer]["at"]
             location = [gps_cache["lat"], gps_cache["lon"]]
             distance_away = distance(next_beacon, location)
-            print(f"[Route Management] Beacon is {round(distance, 1)}m away")
-            if distance_away < beacon_size:
+            print(f"[Route Management] Beacon is {round(distance_away, 1)}m away")
+            if distance_away < gps_accuracy:
                 arrived = route[route_pointer]["do"] == "arrive"
                 last_instruction = route_pointer + 1 >= len(route)
                 if arrived or last_instruction:
@@ -150,10 +164,6 @@ def update():
 
 updater = threading.Thread(target=update)
 updater.start()
-
-# Find the initial gps location
-print("[GPS] Aquiring initial GPS location")
-update_gps()
 
 # Host a webpage for the user to control the device
 app = Flask(__name__)
