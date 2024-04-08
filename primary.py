@@ -133,5 +133,5 @@ def route_control():
     return redirect(url_for("control_centre"))
 
 if __name__ == "__main__":
-    run_command(f"termux-open-url '{get_ip()}'")
+    open_command_centre()
     app.run(host="0.0.0.0")
