@@ -32,7 +32,8 @@ gps_cache = None
 def update_location():
     global gps_cache
     while True:
-        gps_cache = where_am_i()
+        data = where_am_i()
+        gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
 
 locator = threading.Thread(target=update_location)
 locator.start()
