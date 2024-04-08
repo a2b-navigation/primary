@@ -47,7 +47,8 @@ def display_route():
     if route is None:
         return "No route active, activate it above"
     else:
-        result = f"Route name: {route["name"]}\n"
+        name = route["name"]
+        result = f"Route name: {name}\n"
         for c, beacon in enumerate(route["beacons"]):
             match beacon["do"]:
                 case "left": instruction = "Turn left at"
@@ -55,7 +56,8 @@ def display_route():
                 case "depart": instruction = "Depart from"
                 case "arrive": instruction = "Arrive at"
             # Output nice human readable instruction
-            result += f"Step {c + 1}: {instruction} {beacon["at"][0]}, {beacon["at"][1]}"
+            [lat, lon] = beacon["at"]
+            result += f"Step {c + 1}: {instruction} {lat}, {lon}"
             if c == route_pointer: result += " <- Last Instruction" # Show the route progress
             result += "\n"
         return result
