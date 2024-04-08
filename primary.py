@@ -144,7 +144,7 @@ def update():
             print(gps_cache)
             # Update route if necessary
             print("[Route Management] Checking if update is needed...")
-            next_beacon = route[route_pointer]["at"]
+            next_beacon = route["beacons"][route_pointer]["at"]
             location = [gps_cache["lat"], gps_cache["lon"]]
             distance_away = distance(next_beacon, location)
             print(f"[Route Management] Beacon is {round(distance_away, 1)}m away")
