@@ -33,7 +33,6 @@ def where_am_i():
     except:
         print("[GPS] Failed, using termux cache")
         return json.loads(run_command("termux-location -r last"))
-    print("[GPS] Cache updated")
 
 # Will update the gps cache
 gps_cache = None
@@ -41,6 +40,8 @@ def update_gps():
     global gps_cache
     data = where_am_i()
     gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
+    accuracy = round(data["accuracy"], 1)
+    print(f"[GPS] Cache updated with accuracy of {accuracy}m")
 
 # Begin execution!
 
@@ -123,13 +124,44 @@ def route_control():
     global route_pointer
     route_request = request.form["route"]
     if route_request == "none":
+        # User wishes to cancel the route
         active = False
         route_pointer = 0
         route = None
+        print("[Route Management] Route Cancelled")
     else:
+        # User wishes to start a new route
         route = get_route(route_request)
         route_pointer = 0
         active = True
+        print("[Route Management] Route Activated")
+    # Redirect user back to the control centre
+    return redirect(url_for("control_centre"))
+
+# Request to create route
+@app.route("/route/create", methods=["POST"])
+def route_creation():
+    route_start = request.form["start"]
+    route_end = request.form["end"]
+    route_name = request.form["name"]
+    # Fill blank fields with the current GPS location
+    if route_start == "" or route_end == "":
+        gps = where_am_i()
+        if route_start == "": route_start = f"{gps["latitude"]},{gps["longitude"]}"
+        if route_end == "": route_end = f"{gps["latitude"]},{gps["longitude"]}"
+    # Use the directions library to obtain a route
+    new_route = {
+        "name": route_name,
+        "beacons": directions.beacons(route_start, route_end),
+    }
+    # Write the route to a file
+    print("[Route Creation] Saving route...")
+    file_name = f"routes/{route_name.lower()}.json"
+    f = open(file_name, "w")
+    f.write(json.dumps(new_route, indent=4))
+    f.close()
+    # Redirect user back to control centre
+    print("[Route Creation] Completed")
     return redirect(url_for("control_centre"))
 
 if __name__ == "__main__":

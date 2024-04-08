@@ -16,6 +16,22 @@
             <div class="pod pod-border">
                 <h4>Create a route</h4>
                 <p>Tell us your starting point and ending point, and a2b will sort out the rest.</p>
+                <p>Note that the format of start and end must be coordinates in the format <i>latitude,longitude</i></p>
+                <form method="POST" action="{{ url_for('route_creation') }}">
+                    <p>
+                        Name: 
+                        <input name="name" />
+                    </p>
+                    <p>
+                        Start point: 
+                        <input name="start" />
+                    </p>
+                    <p>
+                        End point: 
+                        <input name="end" />
+                    </p>
+                    <input type="submit" value="Generate Route" />
+                </form>
                 <p>Once created, all you'll need to do is activate it below when you're ready to go.</p>
             </div>
 
