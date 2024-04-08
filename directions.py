@@ -12,7 +12,7 @@ def beacons(start, end):
     # Obtain beacons
     print("[Route Creation] Generating beacons...")
     beacons = []
-    instructions = data["routes"][0]["legs"][0]["ste
+    instructions = data["routes"][0]["legs"][0]["steps"]
     for i in instructions:
         i = i["maneuver"]
         match i["type"]:
