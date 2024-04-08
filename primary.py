@@ -4,6 +4,7 @@ Duties of the primary device:
 2. Serve a website for the user to interact with [X]
 3. Manage the route [X]
 4. Create routes [ ]
+5. Actuate the primary server to issue commands based off route and gps [ ]
 5. Allow the secondary server to receive commands based off route and gps [ ]
 """
 
@@ -17,6 +18,12 @@ import os
 # Runs a command on the terminal and returns the output
 def run_command(command):
     return subprocess.check_output("termux-location", shell=True)
+
+# Returns the server IP address
+def open_command_centre():
+    ip = json.loads(run_command("termux-wifi-connectioninfo"))["ip"]
+    run_command(f"termux-open-url 'http://{ip}:5000'")
+    return 
 
 # Returns the GPS location
 def where_am_i():
@@ -126,4 +133,5 @@ def route_control():
     return redirect(url_for("control_centre"))
 
 if __name__ == "__main__":
+    run_command(f"termux-open-url '{get_ip()}'")
     app.run(host="0.0.0.0")
