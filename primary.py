@@ -4,7 +4,7 @@ Duties of the primary device:
 2. Serve a website for the user to interact with [X]
 3. Manage the route [X]
 4. Create routes [X]
-5. Very defensive input validation [ ]
+5. Very defensive input validation [X]
 6. Actuate the primary server to issue commands based off route and gps [ ]
 7. Allow the secondary server to receive commands based off route and gps [ ]
 """
@@ -60,12 +60,14 @@ def where_am_i():
 
 # Will update the gps cache
 gps_cache = None
+gps_accuracy = None
 def update_gps():
     global gps_cache
+    global gps_accuracy
     data = where_am_i()
     gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
-    accuracy = round(data["accuracy"], 1)
-    print(f"[GPS] Cache updated with accuracy of {accuracy}m")
+    gps_accuracy = round(data["accuracy"], 1)
+    print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
 
 # Begin execution!
 
@@ -118,10 +120,33 @@ def get_route(name):
 # Start the thread to continuously update the gps location and route status
 def update():
     global gps_cache
+    global route
+    global route_pointer
+    global active
     while True:
         if active:
+            # Update GPS
             update_gps()
             print(gps_cache)
+            # Update route if necessary
+            print("[Route Management] Checking if update is needed...")
+            next_beacon = route[route_pointer]["at"]
+            location = [gps_cache["lat"], gps_cache["lon"]]
+            distance_away = distance(next_beacon, location)
+            print(f"[Route Management] Beacon is {round(distance, 1)}m away")
+            if distance_away < beacon_size:
+                arrived = route[route_pointer]["do"] == "arrive"
+                last_instruction = route_pointer + 1 >= len(route)
+                if arrived or last_instruction:
+                    # Route has ended, deactivate
+                    active = False
+                    route_pointer = 0
+                    route = None
+                    print("[Route Management] Route Finished")
+                else:
+                    # On to the next instruction
+                    route_pointer += 1
+                    print("[Route Management] Beacon Reached, on to the next one")
 
 updater = threading.Thread(target=update)
 updater.start()
