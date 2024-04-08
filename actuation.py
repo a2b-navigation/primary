@@ -4,7 +4,7 @@ import time as t
 # Tell vibration motor to fire for a certain amount of time
 def burst(length):
     length *= 1000 # Convert to ms
-    subprocess.run(f"termux-vibrate -d {int(length)} -f")
+    subprocess.run(f"termux-vibrate -d {int(length)} -f", shell=True)
     print("On")
     t.sleep(length)
     print("Off")
