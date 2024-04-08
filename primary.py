@@ -17,7 +17,7 @@ import os
 
 # Runs a command on the terminal and returns the output
 def run_command(command):
-    return subprocess.check_output("termux-location", shell=True)
+    return subprocess.check_output(command, shell=True)
 
 # Returns the server IP address
 def open_command_centre():
