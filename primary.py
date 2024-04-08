@@ -109,7 +109,7 @@ def control_centre():
     return render_template("app.html", route=display_route(), routes=list_routes())
 
 # Request to update route
-@app.route("/route")
+@app.route("/route", methods=["POST"])
 def route_control():
     global active
     global route
