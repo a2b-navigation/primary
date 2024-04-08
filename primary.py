@@ -149,8 +149,8 @@ def update():
             distance_away = distance(next_beacon, location)
             print(f"[Route Management] Beacon is {round(distance_away, 1)}m away")
             if distance_away < gps_accuracy + 5:
-                arrived = route[route_pointer]["do"] == "arrive"
-                last_instruction = route_pointer + 1 >= len(route)
+                arrived = route["beacons"][route_pointer]["do"] == "arrive"
+                last_instruction = route_pointer + 1 >= len(route["beacons"])
                 if arrived or last_instruction:
                     # Route has ended, deactivate
                     active = False
