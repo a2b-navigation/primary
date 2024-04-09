@@ -165,8 +165,7 @@ def update():
                     route_pointer += 1
                     print("[Route Management] Beacon Reached, on to the next one")
 
-updater = threading.Thread(target=update)
-updater.setDaemon(True)
+updater = threading.Thread(target=update, daemon=True)
 updater.start()
 
 # Determine self-actuation pattern based off route information and gps location
@@ -204,8 +203,7 @@ def actuation_checker():
                 else: other_device = "none"
                 time.sleep(1)
 
-actuation_checker = threading.Thread(target=actuation_checker)
-actuation_checker.setDaemon(True)
+actuation_checker = threading.Thread(target=actuation_checker, daemon=True)
 actuation_checker.start()
 
 # Host a webpage for the user to control the device
