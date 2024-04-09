@@ -278,6 +278,6 @@ def error(msg):
 
 if __name__ == "__main__":
     open_command_centre()
-    server = mp.Process(target=app.run, args=(host="0.0.0.0",))
+    server = mp.Process(target=app.run, args=("0.0.0.0",))
     server.start()
 
