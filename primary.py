@@ -149,7 +149,7 @@ def update():
             location = [gps_cache["lat"], gps_cache["lon"]]
             distance_away = distance(next_beacon, location)
             print(f"[Route Management] Beacon is {round(distance_away, 1)}m away")
-            if distance_away < gps_accuracy + 5:
+            if distance_away < gps_accuracy + 10:
                 arrived = route["beacons"][route_pointer]["do"] == "arrive"
                 last_instruction = route_pointer + 1 >= len(route["beacons"])
                 if arrived or last_instruction:
