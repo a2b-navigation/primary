@@ -172,8 +172,11 @@ def update():
 updater = threading.Thread(target=update, daemon=True)
 updater.start()
 
-# Determine self-actuation pattern based off route information and gps location
+# Allocate sides between primary and secondary devices
 side = "right" # by default, the primary device is on the right hand side
+other_side = "left" # by default, the secondary device is on the left hand side
+
+# Determine self-actuation pattern based off route information and gps location
 other_device = "none" # This governs what actuation pattern the other device should perform
 def actuation_checker():
     global route
@@ -200,7 +203,7 @@ def actuation_checker():
                 elif distance_away < 70: actuation.far()
                 elif distance_away < 90: actuation.very_far()
                 else: time.sleep(0.5)
-            else:
+            else if route["beacons"][route_pointer]["do"] == other_side:
                 # It is the other device's responsibility to actuate
                 if distance_away < 30: other_device = "very_near"
                 elif distance_away < 50: other_device = "near"
