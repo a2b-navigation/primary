@@ -13,8 +13,6 @@ def actuate(n_vibrations):
         while True:
             burst(time_between)
             t.sleep(time_between)
-    thread = threading.Thread(target=pattern)
-    thread.start()
 
 very_near = lambda: actuate(0.7)
 near = lambda: actuate(1.2)
