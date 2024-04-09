@@ -194,17 +194,17 @@ def update():
                 if route["beacons"][route_pointer]["do"] == side:
                     # It is this device's responsibility to actuate
                     other_device = "none"
-                    if distance_away < 30: actuation.very_near()
-                    elif distance_away < 50: actuation.near()
-                    elif distance_away < 70: actuation.far()
-                    elif distance_away < 90: actuation.very_far()
+                    if distance_away < 40: actuation.very_near()
+                    elif distance_away < 70: actuation.near()
+                    elif distance_away < 100: actuation.far()
+                    elif distance_away < 130: actuation.very_far()
                     else: time.sleep(1)
                 elif route["beacons"][route_pointer]["do"] == other_side:
                     # It is the other device's responsibility to actuate
-                    if distance_away < 30: other_device = "very_near"
-                    elif distance_away < 50: other_device = "near"
-                    elif distance_away < 70: other_device = "far"
-                    elif distance_away < 90: other_device = "very_far"
+                    if distance_away < 40: other_device = "very_near"
+                    elif distance_away < 70: other_device = "near"
+                    elif distance_away < 100: other_device = "far"
+                    elif distance_away < 130: other_device = "very_far"
                     else: other_device = "none"
                     time.sleep(1)
                 else:
@@ -213,7 +213,7 @@ def update():
             gps_thread.join()
             print("[Route Flow] Cycle completed")
         else:
-            time.sleep(0.5)
+            time.sleep(2)
 
 updater = threading.Thread(target=update, daemon=True)
 updater.start()
