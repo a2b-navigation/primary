@@ -177,8 +177,8 @@ def update():
                 last_instruction = route_pointer + 1 >= len(route["beacons"])
                 if arrived or last_instruction:
                     # Route has ended, deactivate
-                    other_device = "none"
                     active = False
+                    other_device = "none"
                     route_pointer = 0
                     route = None
                     print("[Route Management] Route Finished")
@@ -236,8 +236,8 @@ def route_control():
     route_request = request.form["route"]
     if route_request == "none":
         # User wishes to cancel the route
-        other_device = "none"
         active = False
+        other_device = "none"
         route_pointer = 0
         route = None
         print("[Route Management] Route Cancelled")
