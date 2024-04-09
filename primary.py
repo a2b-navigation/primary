@@ -86,7 +86,11 @@ def update_gps():
     global gps_cache
     global gps_accuracy
     data = where_am_i()
-    gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
+    try:
+        gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
+    except:
+        print(f"[GPS] Termux returned invalid data: '\n{data}\n'")
+        return
     gps_accuracy = round(data["accuracy"], 1)
     print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
 
@@ -192,7 +196,7 @@ def update():
                 elif distance_away < 50: actuation.near()
                 elif distance_away < 70: actuation.far()
                 elif distance_away < 90: actuation.very_far()
-                else: time.sleep(0.5)
+                else: time.sleep(1)
             elif route["beacons"][route_pointer]["do"] == other_side:
                 # It is the other device's responsibility to actuate
                 if distance_away < 30: other_device = "very_near"
