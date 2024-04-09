@@ -211,6 +211,8 @@ def actuation_checker():
                 elif distance_away < 90: other_device = "very_far"
                 else: other_device = "none"
                 time.sleep(1)
+            else:
+                time.sleep(1)
 
 actuation_checker = threading.Thread(target=actuation_checker, daemon=True)
 actuation_checker.start()
