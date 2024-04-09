@@ -69,7 +69,15 @@ def where_am_i():
         return json.loads(run_command("termux-location"))
     except:
         print("[GPS] Failed, using termux cache")
-        return json.loads(run_command("termux-location -r last"))
+        try:
+            return json.loads(run_command("termux-location -r last"))
+        except:
+            print("[GPS] Severe GPS failure - returning gps cache if not none")
+            if gps_cache is None:
+                print("[GPS] Catastrophic issue with GPS! Filling with hard-coded default values for now")
+                return {"latitude": 0, "longitude": 0, "accuracy": 10}
+            else:
+                return {"latitude": gps_cache["lat"], "longitude": gps_cache["lon"], "accuracy": 10}
 
 # Will update the gps cache
 gps_cache = None
