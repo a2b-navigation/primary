@@ -203,7 +203,7 @@ def actuation_checker():
                 elif distance_away < 70: actuation.far()
                 elif distance_away < 90: actuation.very_far()
                 else: time.sleep(0.5)
-            else if route["beacons"][route_pointer]["do"] == other_side:
+            elif route["beacons"][route_pointer]["do"] == other_side:
                 # It is the other device's responsibility to actuate
                 if distance_away < 30: other_device = "very_near"
                 elif distance_away < 50: other_device = "near"
