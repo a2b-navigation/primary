@@ -5,8 +5,10 @@ Duties of the primary device:
 3. Manage the route [X]
 4. Create routes [X]
 5. Very defensive input validation [X]
-6. Actuate the primary server to issue commands based off route and gps [ ]
+6. Actuate the primary server to issue commands based off route and gps [X]
 7. Allow the secondary server to receive commands based off route and gps [ ]
+notes:
+- potential bug with coordinate validation (try pasting from google)
 """
 
 from flask import *
@@ -276,6 +278,12 @@ def route_creation():
     print("[Route Creation] Completed")
     return redirect(url_for("control_centre"))
 
+# Instructions for the other 
+@app.route("/other")
+def other():
+    return other_device
+
+# Error message page
 @app.route("/error/<msg>")
 def error(msg):
     return render_template("error.html", msg=msg)
