@@ -9,10 +9,10 @@ Duties of the primary device:
 7. Allow the secondary server to receive commands based off route and gps [ ]
 """
 
+import multiprocessing as mp
 from flask import *
 import subprocess
 import directions
-import threading
 import math as m
 import actuation
 import json
@@ -165,7 +165,7 @@ def update():
                     route_pointer += 1
                     print("[Route Management] Beacon Reached, on to the next one")
 
-updater = threading.Thread(target=update)
+updater = mp.Process(target=update)
 updater.start()
 
 # Determine self-actuation pattern based off route information and gps location
@@ -203,7 +203,7 @@ def actuation_checker():
                 else: other_device = "none"
                 time.sleep(1)
 
-actuation_checker = threading.Thread(target=actuation_checker)
+actuation_checker = mp.Process(target=actuation_checker)
 actuation_checker.start()
 
 # Host a webpage for the user to control the device
