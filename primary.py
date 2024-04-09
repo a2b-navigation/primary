@@ -96,6 +96,12 @@ def update_gps():
 print("[GPS] Aquiring initial GPS location")
 update_gps()
 
+# Allocate sides between primary and secondary devices
+side = "right" # by default, the primary device is on the right hand side
+other_side = "left" # by default, the secondary device is on the left hand side
+
+other_device = "none" # This governs what actuation pattern the other device should perform
+
 # Set up route information
 active = False # Whether we are following a route or not
 route = None # The route we're currently following
@@ -152,8 +158,8 @@ def update():
     while True:
         if active:
             # Update GPS
-            update_gps()
-            print(gps_cache)
+            gps_thread = threading.Thread(target=update_gps, daemon=True)
+            gps_thread.start()
             # Update route if necessary
             print("[Route Management] Checking if update is needed...")
             if route is None: continue
@@ -176,31 +182,7 @@ def update():
                     other_device = "none"
                     route_pointer += 1
                     print("[Route Management] Beacon Reached, on to the next one")
-
-updater = threading.Thread(target=update, daemon=True)
-updater.start()
-
-# Allocate sides between primary and secondary devices
-side = "right" # by default, the primary device is on the right hand side
-other_side = "left" # by default, the secondary device is on the left hand side
-
-# Determine self-actuation pattern based off route information and gps location
-other_device = "none" # This governs what actuation pattern the other device should perform
-def actuation_checker():
-    global route
-    global route_pointer
-    global active
-    global other_device
-    while True:
-        if active:
             print("[Actuation] Determining pattern...")
-            # Where are we going?
-            if route is None: continue
-            next_beacon = route["beacons"][route_pointer]["at"]
-            # Where are we now?
-            location = [gps_cache["lat"], gps_cache["lon"]]
-            # How far away are we?
-            distance_away = distance(next_beacon, location)
             # Determine actuation pattern
             if route is None: continue
             if route["beacons"][route_pointer]["do"] == side:
@@ -221,9 +203,12 @@ def actuation_checker():
                 time.sleep(1)
             else:
                 time.sleep(1)
+            print("[Route Flow] Waiting...")
+            gps_thread.join()
+            print("[Route Flow] Cycle completed")
 
-actuation_checker = threading.Thread(target=actuation_checker, daemon=True)
-actuation_checker.start()
+updater = threading.Thread(target=update, daemon=True)
+updater.start()
 
 # Host a webpage for the user to control the device
 app = Flask(__name__)
