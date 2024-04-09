@@ -159,6 +159,7 @@ def update():
     global route
     global route_pointer
     global active
+    global other_device
     while True:
         if active:
             # Update GPS
@@ -171,7 +172,7 @@ def update():
             location = [gps_cache["lat"], gps_cache["lon"]]
             distance_away = distance(next_beacon, location)
             print(f"[Route Management] Beacon is {round(distance_away, 1)}m away")
-            if distance_away < max(gps_accuracy, 8) + 10:
+            if distance_away <= max(gps_accuracy, 10) + 12:
                 arrived = route["beacons"][route_pointer]["do"] == "arrive"
                 last_instruction = route_pointer + 1 >= len(route["beacons"])
                 if arrived or last_instruction:
