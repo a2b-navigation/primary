@@ -99,6 +99,7 @@ def display_route():
     else:
         name = route["name"]
         result = f"Route name: {name}\n"
+        if route is None: return "No route active, activate it above"
         for c, beacon in enumerate(route["beacons"]):
             match beacon["do"]:
                 case "left": instruction = "Turn left at"
@@ -145,6 +146,7 @@ def update():
             print(gps_cache)
             # Update route if necessary
             print("[Route Management] Checking if update is needed...")
+            if route is None: continue
             next_beacon = route["beacons"][route_pointer]["at"]
             location = [gps_cache["lat"], gps_cache["lon"]]
             distance_away = distance(next_beacon, location)
@@ -180,12 +182,14 @@ def actuation_checker():
         if active:
             print("[Actuation] Determining pattern...")
             # Where are we going?
+            if route is None: continue
             next_beacon = route["beacons"][route_pointer]["at"]
             # Where are we now?
             location = [gps_cache["lat"], gps_cache["lon"]]
             # How far away are we?
             distance_away = distance(next_beacon, location)
             # Determine actuation pattern
+            if route is None: continue
             if route["beacons"][route_pointer]["do"] == side:
                 # It is this device's responsibility to actuate
                 other_device = "none"
