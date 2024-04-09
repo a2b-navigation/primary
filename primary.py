@@ -172,7 +172,7 @@ def update():
             location = [gps_cache["lat"], gps_cache["lon"]]
             distance_away = distance(next_beacon, location)
             print(f"[Route Management] Beacon is {round(distance_away, 1)}m away")
-            if distance_away <= max(gps_accuracy, 10) + 12:
+            if distance_away <= max(gps_accuracy, 10) + 20:
                 arrived = route["beacons"][route_pointer]["do"] == "arrive"
                 last_instruction = route_pointer + 1 >= len(route["beacons"])
                 if arrived or last_instruction:
@@ -189,25 +189,26 @@ def update():
                     print("[Route Management] Beacon Reached, on to the next one")
             print("[Actuation] Determining pattern...")
             # Determine actuation pattern
-            if route is None: continue
-            if route["beacons"][route_pointer]["do"] == side:
-                # It is this device's responsibility to actuate
-                other_device = "none"
-                if distance_away < 30: actuation.very_near()
-                elif distance_away < 50: actuation.near()
-                elif distance_away < 70: actuation.far()
-                elif distance_away < 90: actuation.very_far()
-                else: time.sleep(1)
-            elif route["beacons"][route_pointer]["do"] == other_side:
-                # It is the other device's responsibility to actuate
-                if distance_away < 30: other_device = "very_near"
-                elif distance_away < 50: other_device = "near"
-                elif distance_away < 70: other_device = "far"
-                elif distance_away < 90: other_device = "very_far"
-                else: other_device = "none"
-                time.sleep(1)
-            else:
-                time.sleep(1)
+            for i in range(2):
+                if route is None: continue
+                if route["beacons"][route_pointer]["do"] == side:
+                    # It is this device's responsibility to actuate
+                    other_device = "none"
+                    if distance_away < 30: actuation.very_near()
+                    elif distance_away < 50: actuation.near()
+                    elif distance_away < 70: actuation.far()
+                    elif distance_away < 90: actuation.very_far()
+                    else: time.sleep(1)
+                elif route["beacons"][route_pointer]["do"] == other_side:
+                    # It is the other device's responsibility to actuate
+                    if distance_away < 30: other_device = "very_near"
+                    elif distance_away < 50: other_device = "near"
+                    elif distance_away < 70: other_device = "far"
+                    elif distance_away < 90: other_device = "very_far"
+                    else: other_device = "none"
+                    time.sleep(1)
+                else:
+                    time.sleep(1)
             print("[Route Flow] Waiting...")
             gps_thread.join()
             print("[Route Flow] Cycle completed")
