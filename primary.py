@@ -211,6 +211,8 @@ def update():
             print("[Route Flow] Waiting...")
             gps_thread.join()
             print("[Route Flow] Cycle completed")
+        else:
+            time.sleep(0.5)
 
 updater = threading.Thread(target=update, daemon=True)
 updater.start()
