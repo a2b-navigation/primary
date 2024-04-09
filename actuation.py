@@ -9,10 +9,8 @@ def burst(length):
 # This will actuate a device n_vibrations per second
 def actuate(n_vibrations):
     time_between = 1 / n_vibrations
-    def pattern():
-        while True:
-            burst(time_between)
-            t.sleep(time_between)
+    burst(time_between)
+    t.sleep(time_between)
 
 very_near = lambda: actuate(0.7)
 near = lambda: actuate(1.2)
