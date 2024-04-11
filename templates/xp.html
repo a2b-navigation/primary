@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>a2b simulator</title>
+        <link rel="stylesheet" href="{{ url_for('.static', filename='style.css') }}">
+    </head>
+    <body>
+        <div class="centered">
+            <div class="pod">
+                <h1>a2b simulator</h1>
+                <p>Have an experience of what a2b is like without having to move</p>
+            </div>
+            <div class="columns">
+                <div class="pod pod-border-blue">
+                    <h4>Left Hand Side</h4>
+                    <p>Current pattern: {{ lhs }}</p>
+                    <form method="POST" action="{{ url_for('lhs_control') }}">
+                        <select id="lhs" name="pattern">
+                            <option value="none">None</option>
+                            <option value="very_near">Very Near</option>
+                            <option value="near">Near</option>
+                            <option value="far">Far</option>
+                            <option value="very_far">Very Far</option>
+                        </select>
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+                <div class="pod pod-border-red">
+                    <h4>Right Hand Side</h4>
+                    <p>Current pattern: {{ rhs }}</p>
+                    <form method="POST" action="{{ url_for('rhs_control') }}">
+                        <select id="rhs" name="pattern">
+                            <option value="none">None</option>
+                            <option value="very_near">Very Near</option>
+                            <option value="near">Near</option>
+                            <option value="far">Far</option>
+                            <option value="very_far">Very Far</option>
+                        </select>
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+            </div>
+            <div class="pod">
+                <h4>Video Demonstration</h4>
+            </div>
+        </div>
+    </body>
+</html>

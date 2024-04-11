@@ -6,7 +6,7 @@ Duties of the primary device:
 4. Create routes [X]
 5. Very defensive input validation [X]
 6. Actuate the primary server to issue commands based off route and gps [X]
-7. Allow the secondary server to receive commands based off route and gps [ ]
+7. Allow the secondary server to receive commands based off route and gps [X]
 notes:
 - potential bug with coordinate validation (try pasting from google)
 """
@@ -58,9 +58,10 @@ def run_command(command):
 
 # Returns the server IP address
 def open_command_centre():
-    ip = json.loads(run_command("termux-wifi-connectioninfo"))["ip"]
-    run_command(f"termux-open-url 'http://{ip}:5000'")
-    return 
+    try:
+        ip = json.loads(run_command("termux-wifi-connectioninfo"))["ip"]
+        run_command(f"termux-open-url 'http://{ip}:5000'")
+    except: pass
 
 # Returns the GPS location
 def where_am_i():
@@ -105,6 +106,7 @@ side = "right" # by default, the primary device is on the right hand side
 other_side = "left" # by default, the secondary device is on the left hand side
 
 other_device = "none" # This governs what actuation pattern the other device should perform
+this_device = "none"
 
 # Set up route information
 active = False # Whether we are following a route or not
@@ -160,6 +162,7 @@ def update():
     global route_pointer
     global active
     global other_device
+    global this_device
     while True:
         if active:
             # Update GPS
@@ -179,12 +182,14 @@ def update():
                     # Route has ended, deactivate
                     active = False
                     other_device = "none"
+                    this_device = "none"
                     route_pointer = 0
                     route = None
                     print("[Route Management] Route Finished")
                 else:
                     # On to the next instruction
                     other_device = "none"
+                    this_device = "none"
                     route_pointer += 1
                     print("[Route Management] Beacon Reached, on to the next one")
             print("[Actuation] Determining pattern...")
@@ -234,11 +239,14 @@ def route_control():
     global active
     global route
     global route_pointer
+    global this_device
+    global other_device
     route_request = request.form["route"]
     if route_request == "none":
         # User wishes to cancel the route
         active = False
         other_device = "none"
+        this_device = "none"
         route_pointer = 0
         route = None
         print("[Route Management] Route Cancelled")
@@ -293,6 +301,48 @@ def other():
 @app.route("/error/<msg>")
 def error(msg):
     return render_template("error.html", msg=msg)
+
+# Allow for actuation manual override (for demonstration purposes)
+
+# Simulator page
+@app.route("/simulator")
+def simulator():
+    return render_template("xp.html", lhs=other_device, rhs=this_device)
+
+# Manual override of the left hand side
+@app.route("/lhs_control", methods=["POST"])
+def lhs_control():
+    global active
+    global other_device
+    active = False
+    other_device = request.form["pattern"]
+    return redirect(url_for("simulator"))
+
+current_id = 0
+def rhs_actuation(ID):
+    global this_device
+    global current_id
+    # Run thread until a new command is issued (or there is no actuation command)
+    while this_device != "none" and current_id == ID:
+        match this_device:
+            case "very_far": actuation.very_far()
+            case "far": actuation.far()
+            case "near": actuation.near()
+            case "very_near": actuation.very_near()
+
+# Manual override of the right hand side
+@app.route("/rhs_control", methods=["POST"])
+def rhs_control():
+    global active
+    global this_device
+    global current_id
+    active = False
+    this_device = "none"
+    this_device = request.form["pattern"]
+    current_id += 1
+    t = threading.Thread(target=rhs_actuation, args=(current_id,), daemon=True)
+    t.start()
+    return redirect(url_for("simulator"))
 
 if __name__ == "__main__":
     open_command_centre()

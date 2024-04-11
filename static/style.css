@@ -18,6 +18,16 @@ pre {
     margin: 5px;
 }
 
+div.pod-border-red {
+    border: 1px solid red;
+    border-radius: 10px;
+}
+
+div.pod-border-blue {
+    border: 1px solid blue;
+    border-radius: 10px;
+}
+
 div.pod-border {
     border: 1px solid grey;
     border-radius: 10px;
@@ -47,4 +57,10 @@ body {
 
 input[type="submit"]:hover {
     font-weight: bold;
+}
+
+.columns {
+    display: flex;
+    flex-direction: horizontal;
+    justify-content: space-between;
 }
