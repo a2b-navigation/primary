@@ -41,7 +41,76 @@
             </div>
             <div class="pod">
                 <h4>Video Demonstration</h4>
+                <br>
+                <p id="simulation-status">Current Time: None</p>
+                <button id="simulation-trigger">Begin</button>
+                <br>
+                <video width="560" height="405" id="visual" controls>
+                    <source src="{{ url_for('.static', filename='car.mp4') }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video> 
             </div>
         </div>
     </body>
 </html>
+
+<script>
+
+var side = "none";
+var pattern = "none";
+
+let visual = document.getElementById("visual");
+let trigger = document.getElementById("simulation-trigger");
+let display = document.getElementById("simulation-status");
+
+let instructions = {
+    "0,50": ["none", "none"],
+    "51,54": ["far", "left"],
+    "55,58": ["near", "left"],
+    "59,77": ["very_near", "left"],
+    "78,90": ["none", "none"],
+};
+
+visual.ontimeupdate = () => {
+    // During the video playing
+    let time = Math.round(visual.currentTime);
+    for (const range of Object.keys(instructions)) {
+        const frags = range.split(",");
+        let start = frags[0];
+        let end = frags[1];
+        if (time >= start && time <= end) {
+            pattern = instructions[range][0];
+            side = instructions[range][1];
+            break;
+        }
+    }
+};
+
+function printer() {
+    console.log(pattern + " on " + side);
+
+    if (side != "none") {
+        // Build fake form data
+        let formData = new FormData();
+        formData.append('pattern', pattern);
+
+        // Start buliding new request
+        var xhttp = new XMLHttpRequest();
+
+        // Determine side
+        if (side == "left") {
+            xhttp.open("POST", "{{ url_for('lhs_control') }}", true);
+        } else if (side == "right") {
+            xhttp.open("POST", "{{ url_for('rhs_control') }}", true);
+        }
+
+        // Send request
+        xhttp.send(formData);
+    }
+
+    setTimeout(printer, 500);
+}
+printer()
+
+
+</script>
