@@ -329,7 +329,7 @@ def rhs_actuation(ID):
     global this_device
     global current_id
     global lock
-    while lock: time.sleep(1)
+    while lock: time.sleep(0.2)
     lock = True
     # Run thread until a new command is issued (or there is no actuation command)
     while this_device != "none" and current_id == ID:
