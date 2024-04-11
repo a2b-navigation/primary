@@ -69,7 +69,45 @@ let instructions = {
     "86,91": ["far", "right"],
     "92,96": ["near", "right"],
     "97,113": ["very_near", "right"],
-    "114,200": ["none", "none"],
+    "114,117": ["none", "none"],
+    "118,123": ["far", "right"],
+    "124, 127": ["near", "right"],
+    "128,140": ["very_near", "right"],
+    "141,181": ["none", "none"],
+    "182,186": ["very_far", "right"],
+    "187,191": ["far", "right"],
+    "192,196": ["near", "right"],
+    "197,202": ["very_near", "right"],
+    "203,207": ["very_far", "left"],
+    "208,212": ["far", "left"],
+    "212,217": ["near", "left"],
+    "218,222": ["very_near", "left"],
+    "223,227": ["none", "none"],
+    "228,232": ["very_far", "right"],
+    "233,237": ["far", "right"],
+    "238,242": ["near", "right"],
+    "243,247": ["very_near", "right"],
+    "248,318": ["none", "none"],
+    "319,323": ["very_far", "left"],
+    "324,328": ["far", "left"],
+    "329,334": ["near", "left"],
+    "335,340": ["very_near", "left"],
+    "341,344": ["far", "right"],
+    "345,349": ["near", "right"],
+    "349,353": ["very_near", "right"],
+    "354,359": ["far", "right"],
+    "360,364": ["near", "right"],
+    "365,377": ["very_near", "right"],
+    "378,456": ["none", "none"],
+    "457,461": ["very_far", "right"],
+    "462,466": ["far", "right"],
+    "467,472": ["near", "right"],
+    "473,479": ["very_near", "right"],
+    "480,484": ["very_far", "right"],
+    "485,488": ["far", "right"],
+    "489,494": ["near", "right"],
+    "495,499": ["very_near", "right"],
+    "500,600": ["none", "none"],
 };
 
 visual.ontimeupdate = () => {
@@ -102,10 +140,12 @@ function printer() {
 
         // Determine side
         if (side == "left") {
+            resetRight()
             var xhttp = new XMLHttpRequest();
             xhttp.open("POST", "{{ url_for('lhs_control') }}", true);
             xhttp.send(formData);
         } else if (side == "right") {
+            resetLeft()
             var xhttp = new XMLHttpRequest();
             xhttp.open("POST", "{{ url_for('rhs_control') }}", true);
             xhttp.send(formData);
@@ -125,6 +165,23 @@ function printer() {
     setTimeout(printer, 500);
 }
 printer()
+
+function resetLeft() {
+    let formData = new FormData();
+    formData.append('pattern', 'none');
+    let xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "{{ url_for('lhs_control') }}", true);
+    xhttp.send(formData);
+}
+
+
+function resetRight() {
+    let formData = new FormData();
+    formData.append('pattern', 'none');
+    let xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "{{ url_for('rhs_control') }}", true);
+    xhttp.send(formData);
+}
 
 
 </script>
