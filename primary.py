@@ -304,21 +304,26 @@ def error(msg):
 
 # Allow for actuation manual override (for demonstration purposes)
 
-# Simulator page
+# Simulator feature
 @app.route("/simulator")
 def simulator():
     return render_template("xp.html", lhs=other_device, rhs=this_device)
 
-# Manual override of the left hand side
-@app.route("/lhs_control", methods=["POST"])
-def lhs_control():
+current_id = 0
+def manual_actuation(side, pattern):
     global active
     global other_device
+    global this_device
+    global current_id
     active = False
-    other_device = request.form["pattern"]
-    return redirect(url_for("simulator"))
+    if side == "left":
+        other_device = request.form["pattern"]
+    elif side == "right":
+        this_device = request.form["pattern"]
+        current_id += 1
+        t = threading.Thread(target=rhs_actuation, args=(current_id,), daemon=True)
+        t.start()
 
-current_id = 0
 def rhs_actuation(ID):
     global this_device
     global current_id
@@ -330,18 +335,16 @@ def rhs_actuation(ID):
             case "near": actuation.near()
             case "very_near": actuation.very_near()
 
+# Manual override of the left hand side
+@app.route("/lhs_control", methods=["POST"])
+def lhs_control():
+    manual_actuation("left", request.form["pattern"])
+    return redirect(url_for("simulator"))
+
 # Manual override of the right hand side
 @app.route("/rhs_control", methods=["POST"])
 def rhs_control():
-    global active
-    global this_device
-    global current_id
-    active = False
-    this_device = "none"
-    this_device = request.form["pattern"]
-    current_id += 1
-    t = threading.Thread(target=rhs_actuation, args=(current_id,), daemon=True)
-    t.start()
+    manual_actuation("right", request.form["pattern"])
     return redirect(url_for("simulator"))
 
 if __name__ == "__main__":
