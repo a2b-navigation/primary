@@ -310,6 +310,7 @@ def simulator():
     return render_template("xp.html", lhs=other_device, rhs=this_device)
 
 current_id = 0
+lock = False
 def manual_actuation(side, pattern):
     global active
     global other_device
@@ -327,6 +328,9 @@ def manual_actuation(side, pattern):
 def rhs_actuation(ID):
     global this_device
     global current_id
+    global lock
+    while lock: time.sleep(1)
+    lock = True
     # Run thread until a new command is issued (or there is no actuation command)
     while this_device != "none" and current_id == ID:
         match this_device:
@@ -334,6 +338,7 @@ def rhs_actuation(ID):
             case "far": actuation.far()
             case "near": actuation.near()
             case "very_near": actuation.very_near()
+    lock = False
 
 # Manual override of the left hand side
 @app.route("/lhs_control", methods=["POST"])
