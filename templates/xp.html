@@ -85,17 +85,17 @@ visual.ontimeupdate = () => {
     }
 };
 
-var cache = ["none", "none"];
+var cache = [null, null];
 
 function printer() {
-    console.log(pattern + " on " + side);
 
     // Build fake form data
     let formData = new FormData();
     formData.append('pattern', pattern);
 
     // Only send request if something is different
-    if (cache != [pattern, side]) {
+    if (cache[0] != pattern || cache[1] != side) {
+        console.log(pattern + " on " + side);
         // Start buliding new request
 
         // Determine side
