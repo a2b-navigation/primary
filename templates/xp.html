@@ -67,7 +67,12 @@ let instructions = {
     "0,50": ["none", "none"],
     "51,56": ["near", "left"],
     "57,77": ["very_near", "left"],
-    "78,90": ["none", "none"],
+    "78,80": ["none", "none"],
+    "81,85": ["very_far", "right"],
+    "86,91": ["far", "right"],
+    "92,96": ["near", "right"],
+    "97,113": ["very_near", "right"],
+    "114,200": ["none", "none"],
 };
 
 visual.ontimeupdate = () => {
