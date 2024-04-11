@@ -97,17 +97,26 @@ function printer() {
     // Only send request if something is different
     if (cache != [pattern, side]) {
         // Start buliding new request
-        var xhttp = new XMLHttpRequest();
 
         // Determine side
         if (side == "left") {
+            var xhttp = new XMLHttpRequest();
             xhttp.open("POST", "{{ url_for('lhs_control') }}", true);
+            xhttp.send(formData);
         } else if (side == "right") {
+            var xhttp = new XMLHttpRequest();
             xhttp.open("POST", "{{ url_for('rhs_control') }}", true);
+            xhttp.send(formData);
+        } else {
+            var xhttp1 = new XMLHttpRequest();
+            var xhttp2 = new XMLHttpRequest();
+            xhttp1.open("POST", "{{ url_for('lhs_control') }}", true);
+            xhttp2.open("POST", "{{ url_for('rhs_control') }}", true);
+            xhttp1.send(formData);
+            xhttp2.send(formData);
         }
 
         // Send request
-        xhttp.send(formData);
         cache = [pattern, side];
     }
 
