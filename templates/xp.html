@@ -65,9 +65,8 @@ let display = document.getElementById("simulation-status");
 
 let instructions = {
     "0,50": ["none", "none"],
-    "51,54": ["far", "left"],
-    "55,58": ["near", "left"],
-    "59,77": ["very_near", "left"],
+    "51,56": ["near", "left"],
+    "57,77": ["very_near", "left"],
     "78,90": ["none", "none"],
 };
 
@@ -86,14 +85,17 @@ visual.ontimeupdate = () => {
     }
 };
 
+var cache = ["none", "none"];
+
 function printer() {
     console.log(pattern + " on " + side);
 
-    if (side != "none") {
-        // Build fake form data
-        let formData = new FormData();
-        formData.append('pattern', pattern);
+    // Build fake form data
+    let formData = new FormData();
+    formData.append('pattern', pattern);
 
+    // Only send request if something is different
+    if (cache != [pattern, side]) {
         // Start buliding new request
         var xhttp = new XMLHttpRequest();
 
@@ -106,6 +108,7 @@ function printer() {
 
         // Send request
         xhttp.send(formData);
+        cache = [pattern, side];
     }
 
     setTimeout(printer, 500);
