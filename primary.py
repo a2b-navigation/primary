@@ -129,7 +129,8 @@ def update_gps():
         # While that's running, guess our location in the meanwhile
         next_beacon = route["beacons"][route_pointer]["at"]
         gps_delta = (datetime.datetime.now() - last_gps).seconds
-        gps_cache = loc.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
+        new_coords = loc.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
+        gps_cache = {"lat": new_coords[0], "lon": new_coords[1]}
         print("[GPS] Sending predicted GPS location...")
     else:
         t.join()
