@@ -71,8 +71,9 @@ def where_am_i():
     print("[GPS] Querying...")
     try:
         location = json.loads(run_command("termux-location"))
-        speeds = []
-        last_gps = datetime.datetime.now()
+        if location.contains("latitude"):
+            speeds = [acceleration()]
+            last_gps = datetime.datetime.now()
         return location
     except:
         print("[GPS] Failed, using termux cache")
@@ -100,14 +101,26 @@ last_gps = datetime.datetime.now()
 def update_gps():
     global gps_cache
     global gps_accuracy
-    data = where_am_i()
-    try:
-        gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
-    except:
-        print(f"[GPS] Termux returned invalid data: '\n{data}\n'")
-        return
-    gps_accuracy = round(data["accuracy"], 1)
-    print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
+    global speeds
+    # Attempt to get full GPS location
+    def full_gps():
+        global data
+        data = where_am_i()
+        try:
+            gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
+        except:
+            print(f"[GPS] Termux returned invalid data: '\n{data}\n'")
+            return
+        gps_accuracy = round(data["accuracy"], 1)
+        print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
+    t = threading.Thread(target=full_gps, daemon=True)
+    t.start()
+    # While that's running, guess our location in the meanwhile
+    next_beacon = route["beacons"][route_pointer]["at"]
+    gps_delta = datetime.datetime.now() - last_gps
+    predicted = location.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
+    print("[GPS] Sending predicted GPS location...")
+    return predicted
 
 # Begin execution!
 
@@ -184,8 +197,7 @@ def update():
             # Register speed
             speeds.append(acceleration())
             # Update GPS
-            gps_thread = threading.Thread(target=update_gps, daemon=True)
-            gps_thread.start()
+            update_gps()
             # Update route if necessary
             print("[Route Management] Checking if update is needed...")
             if route is None: continue
@@ -232,9 +244,6 @@ def update():
                     time.sleep(1)
                 else:
                     time.sleep(1)
-            print("[Route Flow] Waiting...")
-            gps_thread.join()
-            print("[Route Flow] Cycle completed")
             print(f"Speeds: {speeds}, last_gps: {last_gps}")
         else:
             time.sleep(2)
