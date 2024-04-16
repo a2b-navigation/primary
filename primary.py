@@ -68,13 +68,15 @@ def open_command_centre():
 def where_am_i():
     global speeds
     global last_gps
+    global firm_gps
     print("[GPS] Querying...")
     try:
         location = json.loads(run_command("termux-location"))
-        if location.contains("latitude"):
-            speeds = [acceleration()]
-            last_gps = datetime.datetime.now()
-        return location
+        gps = {"lat": data["latitude"], "lon": data["longitude"]}
+        speeds = [acceleration()]
+        last_gps = datetime.datetime.now()
+        firm_gps = gps
+        return gps
     except:
         print("[GPS] Failed, using termux cache")
         try:
@@ -94,10 +96,16 @@ def acceleration():
     speed = max([abs(v) for v in values])
     return speed * 3.6
 
+# Set up route information
+active = False # Whether we are following a route or not
+route = None # The route we're currently following
+route_pointer = 0 # How far we are through the route
+
 # Will update the gps cache
 gps_cache = None
 gps_accuracy = None
 last_gps = datetime.datetime.now()
+firm_gps = None
 def update_gps():
     global gps_cache
     global gps_accuracy
@@ -106,21 +114,20 @@ def update_gps():
     def full_gps():
         global data
         data = where_am_i()
-        try:
-            gps_cache = {"lat": data["latitude"], "lon": data["longitude"]}
-        except:
-            print(f"[GPS] Termux returned invalid data: '\n{data}\n'")
-            return
         gps_accuracy = round(data["accuracy"], 1)
         print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
     t = threading.Thread(target=full_gps, daemon=True)
     t.start()
-    # While that's running, guess our location in the meanwhile
-    next_beacon = route["beacons"][route_pointer]["at"]
-    gps_delta = datetime.datetime.now() - last_gps
-    predicted = location.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
-    print("[GPS] Sending predicted GPS location...")
-    return predicted
+    if active:
+        # While that's running, guess our location in the meanwhile
+        next_beacon = route["beacons"][route_pointer]["at"]
+        gps_delta = datetime.datetime.now() - last_gps
+        gps_cache = location.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
+        print("[GPS] Sending predicted GPS location...")
+    else:
+        t.join()
+        return
+
 
 # Begin execution!
 
@@ -134,11 +141,6 @@ other_side = "left" # by default, the secondary device is on the left hand side
 
 other_device = "none" # This governs what actuation pattern the other device should perform
 this_device = "none"
-
-# Set up route information
-active = False # Whether we are following a route or not
-route = None # The route we're currently following
-route_pointer = 0 # How far we are through the route
 
 # Returns a user friendly representation of the route
 def display_route():
