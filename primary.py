@@ -81,26 +81,32 @@ gps_cache = None
 gps_accuracy = None
 last_gps = datetime.datetime.now()
 firm_gps = None
+gps_lock = False
 
 # Returns the GPS location
 def where_am_i():
     global last_gps
     global firm_gps
+    global gps_lock
+    gps_lock = True
     print("[GPS] Querying...")
     try:
         location = json.loads(run_command("termux-location"))
         gps = {"lat": location["latitude"], "lon": location["longitude"], "accuracy": location["accuracy"]}
         last_gps = datetime.datetime.now()
         firm_gps = gps
+        gps_lock = False
         return gps
     except:
         print("[GPS] Failed, using termux cache")
         try:
             location = json.loads(run_command("termux-location -r last"))
             gps = {"lat": location["latitude"], "lon": location["longitude"], "accuracy": location["accuracy"]}
+            gps_lock = False
             return gps
         except:
             print("[GPS] Severe GPS failure - returning gps cache if not none")
+            gps_lock = False
             if gps_cache is None:
                 print("[GPS] Catastrophic issue with GPS! Filling with hard-coded default values for now")
                 return {"lat": 0, "lon": 0, "accuracy": 10}
@@ -196,12 +202,12 @@ def update():
     global active
     global other_device
     global this_device
-    global speeds
     global last_gps
     while True:
         if active:
             # Update GPS
-            update_gps()
+            if not gps_lock:
+                update_gps()
             # Update route if necessary
             print("[Route Management] Checking if update is needed...")
             if route is None: continue
@@ -247,7 +253,6 @@ def update():
                 time.sleep(1)
             else:
                 time.sleep(1)
-            print(f"Speeds: {speeds}, last_gps: {last_gps}")
         else:
             time.sleep(2)
 
