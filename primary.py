@@ -99,14 +99,16 @@ def where_am_i():
     except:
         print("[GPS] Failed, using termux cache")
         try:
-            return json.loads(run_command("termux-location -r last"))
+            location = json.loads(run_command("termux-location -r last"))
+            gps = {"lat": location["latitude"], "lon": location["longitude"], "accuracy": location["accuracy"]}
+            return gps
         except:
             print("[GPS] Severe GPS failure - returning gps cache if not none")
             if gps_cache is None:
                 print("[GPS] Catastrophic issue with GPS! Filling with hard-coded default values for now")
-                return {"latitude": 0, "longitude": 0, "accuracy": 10}
+                return {"lat": 0, "lon": 0, "accuracy": 10}
             else:
-                return {"latitude": gps_cache["lat"], "longitude": gps_cache["lon"], "accuracy": 10}
+                return {"lat": gps_cache["lat"], "lon": gps_cache["lon"], "accuracy": 10}
 
 # Will update the gps cache
 def update_gps():
@@ -117,6 +119,7 @@ def update_gps():
     def full_gps():
         global data
         data = where_am_i()
+        gps_cache = {"lat": data["lat"], "lon": data["lon"]}
         gps_accuracy = round(data["accuracy"], 1)
         print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
     t = threading.Thread(target=full_gps, daemon=True)
@@ -129,8 +132,6 @@ def update_gps():
         print("[GPS] Sending predicted GPS location...")
     else:
         t.join()
-        return
-
 
 # Begin execution!
 
