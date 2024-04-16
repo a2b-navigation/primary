@@ -82,31 +82,27 @@ gps_accuracy = None
 last_gps = datetime.datetime.now()
 firm_gps = None
 gps_lock = False
+speed = None
 
 # Returns the GPS location
 def where_am_i():
     global last_gps
     global firm_gps
-    global gps_lock
-    gps_lock = True
     print("[GPS] Querying...")
     try:
         location = json.loads(run_command("termux-location"))
         gps = {"lat": location["latitude"], "lon": location["longitude"], "accuracy": location["accuracy"]}
         last_gps = datetime.datetime.now()
         firm_gps = gps
-        gps_lock = False
         return gps
     except:
         print("[GPS] Failed, using termux cache")
         try:
             location = json.loads(run_command("termux-location -r last"))
             gps = {"lat": location["latitude"], "lon": location["longitude"], "accuracy": location["accuracy"]}
-            gps_lock = False
             return gps
         except:
             print("[GPS] Severe GPS failure - returning gps cache if not none")
-            gps_lock = False
             if gps_cache is None:
                 print("[GPS] Catastrophic issue with GPS! Filling with hard-coded default values for now")
                 return {"lat": 0, "lon": 0, "accuracy": 10}
@@ -117,27 +113,35 @@ def where_am_i():
 def update_gps():
     global gps_cache
     global gps_accuracy
+    global gps_lock
+    global speed
     # Attempt to get full GPS location
     def full_gps():
         global data
         global gps_cache
         global gps_accuracy
+        global gps_lock
+        global speed
+        gps_lock = True
+        speed = acceleration()
         data = where_am_i()
         gps_cache = {"lat": data["lat"], "lon": data["lon"]}
         gps_accuracy = round(data["accuracy"], 1)
         print(f"[GPS] Cache updated with accuracy of {gps_accuracy}m")
-    t = threading.Thread(target=full_gps, daemon=True)
-    t.start()
+        gps_lock = False
+    t = None
+    if not gps_lock:
+        t = threading.Thread(target=full_gps, daemon=True)
+        t.start()
     if active:
         # While that's running, guess our location in the meanwhile
         next_beacon = route["beacons"][route_pointer]["at"]
         gps_delta = (datetime.datetime.now() - last_gps).seconds
-        speed = acceleration()
         new_coords = loc.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speed, next_beacon)
         gps_cache = {"lat": new_coords[0], "lon": new_coords[1]}
         print("[GPS] Sending predicted GPS location...")
         print(f"[GPS] speed: {speed} gps_delta: {gps_delta}")
-    else:
+    else if t is not None:
         t.join()
 
 # Begin execution!
@@ -207,8 +211,7 @@ def update():
     while True:
         if active:
             # Update GPS
-            if not gps_lock:
-                update_gps()
+            update_gps()
             # Update route if necessary
             print("[Route Management] Checking if update is needed...")
             if route is None: continue
