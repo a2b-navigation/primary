@@ -66,7 +66,6 @@ def open_command_centre():
     except: pass
 
 # Returns the speed of the device in kmh
-speeds = []
 def acceleration():
     values = json.loads(run_command("termux-sensor -s linear_acceleration -n 1"))["linear_acceleration"]["values"]
     speed = max([abs(v) for v in values])
@@ -85,14 +84,12 @@ firm_gps = None
 
 # Returns the GPS location
 def where_am_i():
-    global speeds
     global last_gps
     global firm_gps
     print("[GPS] Querying...")
     try:
         location = json.loads(run_command("termux-location"))
         gps = {"lat": location["latitude"], "lon": location["longitude"], "accuracy": location["accuracy"]}
-        speeds = [acceleration()]
         last_gps = datetime.datetime.now()
         firm_gps = gps
         return gps
@@ -114,7 +111,6 @@ def where_am_i():
 def update_gps():
     global gps_cache
     global gps_accuracy
-    global speeds
     # Attempt to get full GPS location
     def full_gps():
         global data
@@ -130,7 +126,8 @@ def update_gps():
         # While that's running, guess our location in the meanwhile
         next_beacon = route["beacons"][route_pointer]["at"]
         gps_delta = (datetime.datetime.now() - last_gps).seconds
-        new_coords = loc.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
+        speed = acceleration()
+        new_coords = loc.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speed, next_beacon)
         gps_cache = {"lat": new_coords[0], "lon": new_coords[1]}
         print("[GPS] Sending predicted GPS location...")
     else:

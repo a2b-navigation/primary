@@ -51,14 +51,13 @@ def move_coordinate(lat, lon, bearing_degrees, distance_km):
     
     return new_lat, new_lon
 
-def interpolate_gps(latest_gps_coordinates, latest_gps_ago, speeds, next_beacon):
+def interpolate_gps(latest_gps_coordinates, latest_gps_ago, speed, next_beacon):
     # Work out the direction the user should be going in (when heading towards the next beacon)
     lat, lon = latest_gps_coordinates
     bearing = direction_from_coordinates(lat, lon, next_beacon[0], next_beacon[1])
     
     # Guess how far you've travelled since the last GPS update
-    avg_speed = sum(speeds) / len(speeds)
-    travelled = (avg_speed / 1000) * latest_gps_ago
+    travelled = (speed / 1000) * latest_gps_ago
 
     # Use these estimations to guess where the user would be
     return move_coordinate(*latest_gps_coordinates, bearing, travelled)
