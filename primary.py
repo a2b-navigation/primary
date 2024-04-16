@@ -118,6 +118,7 @@ def update_gps():
     # Attempt to get full GPS location
     def full_gps():
         global data
+        global gps_cache
         data = where_am_i()
         gps_cache = {"lat": data["lat"], "lon": data["lon"]}
         gps_accuracy = round(data["accuracy"], 1)
@@ -132,7 +133,6 @@ def update_gps():
         print("[GPS] Sending predicted GPS location...")
     else:
         t.join()
-        print(f"[GPS] Got {gps_cache}")
 
 # Begin execution!
 
