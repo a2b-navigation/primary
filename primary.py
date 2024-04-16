@@ -64,6 +64,24 @@ def open_command_centre():
         run_command(f"termux-open-url 'http://{ip}:5000'")
     except: pass
 
+# Returns the speed of the device in kmh
+speeds = []
+def acceleration():
+    values = json.loads(run_command("termux-sensor -s linear_acceleration -n 1"))["linear_acceleration"]["values"]
+    speed = max([abs(v) for v in values])
+    return speed * 3.6
+
+# Set up route information
+active = False # Whether we are following a route or not
+route = None # The route we're currently following
+route_pointer = 0 # How far we are through the route
+
+# Set up GPS information
+gps_cache = None
+gps_accuracy = None
+last_gps = datetime.datetime.now()
+firm_gps = None
+
 # Returns the GPS location
 def where_am_i():
     global speeds
@@ -89,23 +107,7 @@ def where_am_i():
             else:
                 return {"latitude": gps_cache["lat"], "longitude": gps_cache["lon"], "accuracy": 10}
 
-# Returns the speed of the device in kmh
-speeds = []
-def acceleration():
-    values = json.loads(run_command("termux-sensor -s linear_acceleration -n 1"))["linear_acceleration"]["values"]
-    speed = max([abs(v) for v in values])
-    return speed * 3.6
-
-# Set up route information
-active = False # Whether we are following a route or not
-route = None # The route we're currently following
-route_pointer = 0 # How far we are through the route
-
 # Will update the gps cache
-gps_cache = None
-gps_accuracy = None
-last_gps = datetime.datetime.now()
-firm_gps = None
 def update_gps():
     global gps_cache
     global gps_accuracy
