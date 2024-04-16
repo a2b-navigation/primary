@@ -67,9 +67,12 @@ def open_command_centre():
 
 # Returns the speed of the device in m/s
 def acceleration():
-    values = json.loads(run_command("termux-sensor -s linear_acceleration -n 1"))["linear_acceleration"]["values"]
-    speed = max([abs(v) for v in values])
-    return speed
+    global speed
+    try:
+        values = json.loads(run_command("termux-sensor -s linear_acceleration -n 1"))["linear_acceleration"]["values"]
+        speed = max([abs(v) for v in values])
+    except:
+        print("[Acceleration] Failed to get acceleration sensor reading")
 
 # Set up route information
 active = False # Whether we are following a route or not
@@ -121,9 +124,8 @@ def update_gps():
         global gps_cache
         global gps_accuracy
         global gps_lock
-        global speed
         gps_lock = True
-        speed = acceleration()
+        acceleration()
         data = where_am_i()
         gps_cache = {"lat": data["lat"], "lon": data["lon"]}
         gps_accuracy = round(data["accuracy"], 1)
@@ -219,7 +221,7 @@ def update():
             location = [gps_cache["lat"], gps_cache["lon"]]
             distance_away = distance(next_beacon, location)
             print(f"[Route Management] Beacon is {round(distance_away, 1)}m away")
-            if distance_away <= max(gps_accuracy, 10) + 20:
+            if distance_away <= max(gps_accuracy, 10) + 15:
                 arrived = route["beacons"][route_pointer]["do"] == "arrive"
                 last_instruction = route_pointer + 1 >= len(route["beacons"])
                 if arrived or last_instruction:
