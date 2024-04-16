@@ -136,6 +136,7 @@ def update_gps():
         new_coords = loc.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speed, next_beacon)
         gps_cache = {"lat": new_coords[0], "lon": new_coords[1]}
         print("[GPS] Sending predicted GPS location...")
+        print(f"[GPS] speed: {speed} gps_delta: {gps_delta}")
     else:
         t.join()
 
