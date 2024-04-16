@@ -141,7 +141,7 @@ def update_gps():
         gps_cache = {"lat": new_coords[0], "lon": new_coords[1]}
         print("[GPS] Sending predicted GPS location...")
         print(f"[GPS] speed: {speed} gps_delta: {gps_delta}")
-    else if t is not None:
+    elif t is not None:
         t.join()
 
 # Begin execution!
