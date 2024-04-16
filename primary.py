@@ -17,6 +17,7 @@ import directions
 import threading
 import math as m
 import actuation
+import datetime
 import json
 import time
 import os
@@ -65,9 +66,14 @@ def open_command_centre():
 
 # Returns the GPS location
 def where_am_i():
+    global speeds
+    global last_gps
     print("[GPS] Querying...")
     try:
-        return json.loads(run_command("termux-location"))
+        location = json.loads(run_command("termux-location"))
+        speeds = []
+        last_gps = datetime.datetime.now()
+        return location
     except:
         print("[GPS] Failed, using termux cache")
         try:
@@ -80,9 +86,17 @@ def where_am_i():
             else:
                 return {"latitude": gps_cache["lat"], "longitude": gps_cache["lon"], "accuracy": 10}
 
+# Returns the speed of the device in kmh
+speeds = []
+def acceleration():
+    values = json.loads(run_command("termux-sensor -s linear_acceleration -n 1"))["linear_acceleration"]["values"]
+    speed = max([abs(v) for v in values])
+    return speed * 3.6
+
 # Will update the gps cache
 gps_cache = None
 gps_accuracy = None
+last_gps = datetime.datetime.now()
 def update_gps():
     global gps_cache
     global gps_accuracy
@@ -163,8 +177,12 @@ def update():
     global active
     global other_device
     global this_device
+    global speeds
+    global last_gps
     while True:
         if active:
+            # Register speed
+            speeds.append(acceleration())
             # Update GPS
             gps_thread = threading.Thread(target=update_gps, daemon=True)
             gps_thread.start()
@@ -217,6 +235,7 @@ def update():
             print("[Route Flow] Waiting...")
             gps_thread.join()
             print("[Route Flow] Cycle completed")
+            print(f"Speeds: {speeds}, last_gps: {last_gps}")
         else:
             time.sleep(2)
 
