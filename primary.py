@@ -11,6 +11,7 @@ notes:
 - potential bug with coordinate validation (try pasting from google)
 """
 
+import location as loc
 from flask import *
 import subprocess
 import directions
@@ -124,7 +125,7 @@ def update_gps():
         # While that's running, guess our location in the meanwhile
         next_beacon = route["beacons"][route_pointer]["at"]
         gps_delta = datetime.datetime.now() - last_gps
-        gps_cache = location.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
+        gps_cache = loc.interpolate_gps([gps_cache["lat"], gps_cache["lon"]], gps_delta, speeds, next_beacon)
         print("[GPS] Sending predicted GPS location...")
     else:
         t.join()
