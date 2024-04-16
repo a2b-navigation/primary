@@ -132,6 +132,7 @@ def update_gps():
         print("[GPS] Sending predicted GPS location...")
     else:
         t.join()
+        print(f"[GPS] Got {gps_cache}")
 
 # Begin execution!
 
