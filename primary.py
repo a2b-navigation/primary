@@ -65,11 +65,11 @@ def open_command_centre():
         run_command(f"termux-open-url 'http://{ip}:5000'")
     except: pass
 
-# Returns the speed of the device in kmh
+# Returns the speed of the device in m/s
 def acceleration():
     values = json.loads(run_command("termux-sensor -s linear_acceleration -n 1"))["linear_acceleration"]["values"]
     speed = max([abs(v) for v in values])
-    return speed * 3.6
+    return speed
 
 # Set up route information
 active = False # Whether we are following a route or not
