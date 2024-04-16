@@ -90,7 +90,7 @@ def where_am_i():
     print("[GPS] Querying...")
     try:
         location = json.loads(run_command("termux-location"))
-        gps = {"lat": data["latitude"], "lon": data["longitude"]}
+        gps = {"lat": location["latitude"], "lon": location["longitude"]}
         speeds = [acceleration()]
         last_gps = datetime.datetime.now()
         firm_gps = gps
