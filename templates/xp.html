@@ -43,7 +43,7 @@
                 <h4>Video Demonstration</h4>
                 <br>
                 <video width="560" height="405" id="visual" controls>
-                    <source src="{{ url_for('.static', filename='car.mp4') }}" type="video/mp4">
+                    <source src="{{ url_for('.static', filename='cycle.mp4') }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video> 
             </div>
@@ -60,6 +60,7 @@ let visual = document.getElementById("visual");
 let trigger = document.getElementById("simulation-trigger");
 let display = document.getElementById("simulation-status");
 
+/*
 let instructions = {
     "0,50": ["none", "none"],
     "51,56": ["near", "left"],
@@ -108,6 +109,36 @@ let instructions = {
     "489,494": ["near", "right"],
     "495,499": ["very_near", "right"],
     "500,600": ["none", "none"],
+};
+*/
+
+let instructions = {
+    // Turn 
+    "0,4": ["near", "left"],
+    "5,8": ["very_near", "left"],
+    // Turn 
+    "9,16": ["very_near", "right"],
+    // Turn 
+    "17,22": ["very_near", "left"],
+    // Turn 
+    "23,27": ["very_near", "right"],
+    // Turn 
+    "28,35": ["very_near", "left"],
+    "36,47": ["none", "none"],
+    // Turn 
+    "48,52": ["very_far", "left"],
+    "53,57": ["far", "left"],
+    "58,62": ["near", "left"],
+    "63,67": ["very_near", "left"],
+    // Turn 
+    "68,69": ["very_far", "left"],
+    "70,74": ["far", "left"],
+    "75,79": ["near", "left"],
+    "80,84": ["very_near", "left"],
+    // Turn
+    "85,89": ["very_near", "right"],
+    // End
+    "90,99": ["none", "none"],
 };
 
 visual.ontimeupdate = () => {
