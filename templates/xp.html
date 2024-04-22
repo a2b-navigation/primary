@@ -112,6 +112,7 @@ let instructions = {
 };
 */
 
+/*
 let instructions = {
     // Turn 
     "0,4": ["near", "left"],
@@ -139,6 +140,39 @@ let instructions = {
     "85,89": ["very_near", "right"],
     // End
     "90,99": ["none", "none"],
+};
+*/
+
+let instructions = {
+    "0,2": ["none", "none"],
+    "3,7": ["near", "left"],
+    "8,12": ["very_near", "left"],
+    // Reset
+    "13,17": ["far", "left"],
+    "18,22": ["near", "left"],
+    "22,26": ["very_near", "left"],
+    // Reset
+    "27,31": ["very_far", "right"],
+    "32,36": ["far", "right"],
+    "37,41": ["near", "right"],
+    "42,46": ["very_near", "right"],
+    // Reset
+    "47,48": ["none", "none"],
+    "49,53": ["very_far", "right"],
+    "54,58": ["far", "right"],
+    "59,63": ["near", "right"],
+    "64,68": ["very_near", "right"],
+    // Reset
+    "69,74": ["far", "left"],
+    "75,79": ["near", "left"],
+    "80,84": ["very_near", "left"],
+    // Reset
+    "85,89": ["very_far", "left"],
+    "90,94": ["far", "left"],
+    "95,99": ["near", "left"],
+    "100,113": ["very_near", "left"],
+    "114,130": ["none", "none"],
+
 };
 
 visual.ontimeupdate = () => {
